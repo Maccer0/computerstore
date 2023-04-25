@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head}"></head>
+
+<body>
+  <nav th:replace="~{fragments/nav :: nav-front}"></nav>
+
+  <div class="container-fluid mt-5">
+    <div class="row">
+      <div th:replace="~{fragments/categories}"></div>
+      <div class="col"></div>
+      <div  class="col-8">
+
+        <h2 class="display-6 mb-5" th:text="${product.name}"></h2>
+        <div class="row">
+          <div class="col-4">
+            <p>
+              <img style="width: 200px;" th:src="@{'/media/' + ${product.image}}">
+            </p>
+          </div>
+          <div class="col-8">
+            <div class="text-wrap" th:utext="${product.description}"></div>
+            <p th:text="'$' + ${product.price}"></p>
+            <div style="position: relative;">
+              <p>
+                <a class="btn btn-primary addToCart" th:attr="data-id=${product.id}"
+                   th:href="@{'/cart/add/' + ${product.id}}">Add to cart</a>
+                <img class="ajaxLoader d-none" th:src="@{/images/Ajax-loader.gif}" alt="">
+              </p>
+              <div class="btn btn-sm btn-success hide productAdded">Product added to cart!</div>
+            </div>
+          </div>
+      </div>
+      <div class="col"></div>
+    </div>
+  </div>
+  <div th:replace="~{fragments/footer}"></div>
+  <script>
+    $("a.addToCart").click(function (e) {
+      e.preventDefault();
+
+      let $this = $(this);
+      $this.next().removeClass("d-none");
+
+      let id = $this.attr("data-id");
+      let url = "/cart/add/" + id;
+
+      $.get(url, {}, function(data) {
+        $('div.cart').html(data);
+      }).done(function() {
+        $this.parent().parent().find('div.productAdded').fadeIn();
+        $this.next().addClass('d-none');
+        setTimeout(() => {
+          $this.parent().parent().find('div.productAdded').fadeOut();
+        }, 1000);
+      });
+    })
+  </script>
+</body>
+</html>
